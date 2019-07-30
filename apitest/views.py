@@ -9,7 +9,12 @@ from django.contrib.auth import authenticate, login
 def test(request):
     return HttpResponse("hello test")
 # def login(request):
-#     return render(request,'login.html')
+# #     return render(request,'login.html')
+def logout(request):
+    auth.logout(request)
+    return render(request,'login.html')
+def home(request):
+    return render(request,"home.html")
 def login(request):
     if request.POST:
         username = password = ''
