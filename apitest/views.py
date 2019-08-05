@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import auth
 from django.contrib.auth import authenticate, login
 from apitest.models import Apitest,Apistep,Apis
+import pymysql
 
 
 def test(request):
@@ -52,3 +53,21 @@ def apis_manage(request):
     username = request.session.get('user', '')
     apis_list = Apis.objects.all()
     return render(request, "apis_manage.html", {"user": username,"apiss": apis_list})
+# 测试报告
+@login_required
+def test_report(request):
+    username = request.session.get('user', '')
+    apis_list = Apis.objects.all()
+    apis_count = Apis.objects.all().count() #统计接口数
+    db = pymysql.connect(user='zhdbuser', db='autotest',port=3306, passwd='zhdbuser123', host='10.30.50.167')
+    cursor = db.cursor()
+    sql1 = 'SELECT count(id) FROM apitest_apis WHERE apitest_apis.apistatus=1'
+    aa=cursor.execute(sql1)
+    apis_pass_count = [row[0] for row in cursor.fetchmany(aa)][0]
+    sql2 = 'SELECT count(id) FROM apitest_apis WHERE apitest_apis.apistatus=0'
+    bb=cursor.execute(sql2)
+    apis_fail_count = [row[0] for row in cursor.fetchmany(bb)][0]
+    db.close()
+    return render(request, "report.html", {"user": username,"apiss": apis_list,"apiscounts":apis_count,"apis_pass_counts": apis_pass_count,"apis_fail_counts": apis_fail_count}) #把值赋给apiscounts 变量
+def left(request):
+    return render(request,"left.html")

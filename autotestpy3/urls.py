@@ -15,8 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from apitest import  views
-from product import  proviews
+from apitest import views
+from product import proviews
+from set import setviews
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('test/', views.test),
@@ -27,4 +28,8 @@ urlpatterns = [
     path('apitest_manage/', views.apitest_manage),
     path('apistep_manage/', views.apistep_manage),
     path('apis_manage/', views.apis_manage),
+    path('set_manage/', setviews.set_manage),
+    path('set_user/', setviews.set_user),
+    path('test_report/', views.test_report),
+    path('left/', views.left),
 ]
