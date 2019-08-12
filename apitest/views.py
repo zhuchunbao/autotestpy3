@@ -71,3 +71,17 @@ def test_report(request):
     return render(request, "report.html", {"user": username,"apiss": apis_list,"apiscounts":apis_count,"apis_pass_counts": apis_pass_count,"apis_fail_counts": apis_fail_count}) #把值赋给apiscounts 变量
 def left(request):
     return render(request,"left.html")
+# 搜索功能
+@login_required
+def apisearch(request):
+    username = request.session.get('user', '') # 读取浏览器登录 session
+    search_apitestname = request.GET.get("apitestname", "")
+    apitest_list = Apitest.objects.filter(apitestname__icontains=search_apitestname)
+    return render(request,'apitest_manage.html', {"user": username,"apitests":apitest_list})
+# 搜索功能
+@login_required
+def apissearch(request):
+    username = request.session.get('user', '') # 读取浏览器登录 Session
+    search_apiname = request.GET.get("apiname", "")
+    apis_list = Apis.objects.filter(apiname__icontains=search_apiname)
+    return render(request,'apis_manage.html', {"user": username,"apiss":apis_list})

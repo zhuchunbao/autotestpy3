@@ -32,4 +32,8 @@ urlpatterns = [
     path('set_user/', setviews.set_user),
     path('test_report/', views.test_report),
     path('left/', views.left),
+    path ('apisearch/', views.apisearch),
+    path ('apissearch/', views.apissearch),
+    path ('setsearch/', setviews.setsearch),
+    path ('productsearch/', proviews.productsearch),
 ]
