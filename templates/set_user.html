@@ -42,6 +42,8 @@ white-space:nowrap;overflow:hidden;text-overflow: ellipsis;
 </style>
 <thead>
 <tr><th>ID</th><th>用户名</th><th>密码</th><th>邮箱</th><th>最近登录日期</th><th>注册日期</th>
+<th>编辑</th><th>删除</th>
+
 </tr>
 </thead>
 <tbody>
@@ -53,6 +55,12 @@ white-space:nowrap;overflow:hidden;text-overflow: ellipsis;
 <td>{{user.email}}</td>
 <td>{{user.last_login}}</td>
 <td>{{user.date_joined}}</td>
+<td><a style='color:light blue' class="related-widget-wrapper-link add-related" id="add_id_User"
+href="../admin/auth/user/{{ user.id }}/change/?_to_field=id&_popup=1"><img
+src="/static/admin/img/icon-changelink.svg"/></a></td>
+<td><a style='color:light blue' class="related-widget-wrapper-link add-related" id="add_id_User"
+href="../admin/auth/user/{{ user.id }}/delete/?_to_field=id&_popup=1"><img
+src="/static/admin/img/icon-deletelink.svg"/></a></td>
 </tr>
 {% endfor %}
 </tbody>

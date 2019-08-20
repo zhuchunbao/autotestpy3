@@ -31,7 +31,8 @@
 <thead>
 <tr><td>&nbsp;</td></tr>
 <tr>
-<th>ID</th><th>产品名称</th><th>产品描述</th><th>产品负责人</th><th>创建时间</th>
+<th>ID</th><th>产品名称</th><th>产品描述</th><th>产品负责人</th><th>创建时间</th><th>编辑</th><th>删除</th>
+
 </tr>
 </thead>
 <tbody>
@@ -42,6 +43,12 @@
 <td>{{ product.productdesc }}</td>
 <td>{{ product.producter }}</td>
 <td>{{ product.create_time }}</td>
+<td><a style='color:light blue' class="related-widget-wrapper-link add-related" id="add_id_Product"
+href="../admin/product/product/{{ product.id }}/change/?_to_field=id&_popup=1"><img
+src="/static/admin/img/icon-changelink.svg"/></a></td>
+<td><a style='color:light blue' class="related-widget-wrapper-link add-related" id="add_id_Product"
+href="../admin/product/product/{{ apitest.id }}/delete/?_to_field=id&_popup=1"><img
+src="/static/admin/img/icon-deletelink.svg"/></a></td>
 </tr>
 {% endfor %}
 </tbody>

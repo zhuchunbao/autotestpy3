@@ -15,3 +15,5 @@ class ApisAdmin(admin.TabularInline):
     list_display =['apiname','apiurl','apiparamvalue','apimethod','apiresult','apistatus','create_time','id','product']
 admin.site.register(Apis)
 admin.site.register(Apitest,ApitestAdmin)
+admin.site.site_title = 'AutotestPlat'
+admin.site.site_header = 'AtotestPlat'

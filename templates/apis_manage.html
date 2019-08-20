@@ -16,17 +16,12 @@
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
 <div class="container">
 <a class="navbar-brand" href="#">&nbsp;</a>
+
 <ul class="nav justify-content-center">
- 。
-<ul class="nav justify-content-center">
-<li><a style='color:white' href="/apitest_manage/">流程接口测试用例</a></li>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<li class="active"><a style='color:white' href="/apistep_manage/">流程接口测试步骤</a></li>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-<li class="active"><a style='color:white' href="/apis_manage/">单一接口测试用例</a></li>
-</ul>
+<li class="active"><a style='color:white' href="/apis_manage/">单一接口</a></li>
+&nbsp;&nbsp;&nbsp;&nbsp;
+<li><a style='color:white' href="/apitest_manage/">流程接口</a></li>
+&nbsp;&nbsp;&nbsp;&nbsp;
 </ul>
 <ul class="nav justify-content-end">
 <li class="nav-link"><a style='color:white' href="#">{{user}}</a></li>
@@ -40,7 +35,8 @@
 <thead>
 <tr>
 <th>ID</th><th>产品</th><th>单一接口测试用例名称</th><th>URL 地址</th><th>参数=值</th><th>方法</th><th>
-预期结果</th><th>测试结果</th><th>时间</th>
+预期结果</th><th>测试结果</th><th>时间</th><th>编辑</th><th>删除</th>
+
 </tr>
 </thead>
 <tbody>
@@ -55,6 +51,12 @@
 <td>{{ apis.apiresult }}</td>
 <td>{{ apis.apistatus }}</td>
 <td>{{ apis.create_time }}</td>
+    <td><a style='color:light blue' class="related-widget-wrapper-link add-related" id="add_id_Apis"
+href="../admin/apitest/apis/{{ apis.id }}/change/?_to_field=id&_popup=1"><img
+src="/static/admin/img/icon-changelink.svg"/></a></td>
+<td><a style='color:light blue' class="related-widget-wrapper-link add-related" id="add_id_Apis"
+href="../admin/apitest/apis/{{ apis.id }}/delete/?_to_field=id&_popup=1"><img
+src="/static/admin/img/icon-deletelink.svg"/></a></td>
 </tr>
 {% endfor %}
 </tbody>

@@ -36,4 +36,6 @@ urlpatterns = [
     path ('apissearch/', views.apissearch),
     path ('setsearch/', setviews.setsearch),
     path ('productsearch/', proviews.productsearch),
+    path ('welcome/', views.welcome),
+    path('apistep_manage/', views.apistep_manage,name='apistep_manage'),
 ]

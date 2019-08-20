@@ -85,3 +85,14 @@ def apissearch(request):
     search_apiname = request.GET.get("apiname", "")
     apis_list = Apis.objects.filter(apiname__icontains=search_apiname)
     return render(request,'apis_manage.html', {"user": username,"apiss":apis_list})
+def welcome(request):
+    return render(request,"welcome.html")
+# 接口步骤管理
+@login_required
+def apistep_manage(request):
+    username = request.session.get('user', '')
+    apitestid = request.GET.get('apitest.id',None)
+    apitest = Apitest.objects.get(id=apitestid)
+    apistep_list = Apistep.objects.all()
+    return render(request, "apistep_manage.html", {"user": username,"apitest": apitest,"apisteps":
+apistep_list})
