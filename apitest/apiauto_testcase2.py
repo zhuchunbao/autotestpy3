@@ -1,39 +1,30 @@
 #!/usr/bin/env python
 # _*_ coding:utf-8 _*_
-import requests, time, sys, re
-import urllib, zlib
-import pymysql,pytest
-from trace import CoverageResults
+import requests, time, re
+import urllib
+import pymysql
 import json
-from idlelib.rpc import response_queue
-from time import sleep
+#import ifconfig
 HOSTNAME = '127.0.0.1'
-# 读取数据库中相应的接口用例数据
-
 def test_readSQLcase():
-    sql="SELECT id,`apiname`,apiurl,apimethod,apiparamvalue,apiresult,`apistatus` from apitest_apistep where apitest_apistep.Apitest_id=1 "
+    sql="SELECT id,`apiname`,apiurl,apimethod,apiparamvalue,apiresult,`apistatus` from apitest_apis "
     coon =pymysql.connect(user='zhdbuser',passwd='zhdbuser123',db='autotest',port=3306,host='10.30.50.167',charset='utf8')
     cursor = coon.cursor()
     aa=cursor.execute(sql)
     info = cursor.fetchmany(aa)
+    print (info)
     for ii in info:
         case_list = []
         case_list.append(ii)
-        # CredentialId()
         interfaceTest(case_list)
-    coon.commit()
-    cursor.close()
-    coon.close()
+        coon.commit()
+        cursor.close()
+        coon.close()
 def interfaceTest(case_list):
     res_flags = []
     request_urls = []
     responses = []
-    strinfo = re.compile('{TaskId}')
-    strinfo1 = re.compile('{AssetId}')
-    strinfo2 = re.compile('{PointId}')
-    assetinfo = re.compile('{assetno}')
-    tasknoinfo = re.compile('{taskno}')
-    schemainfo = re.compile('{schema}')
+    strinfo = re.compile('{seturl}')
     for case in case_list:
         try:
             case_id = case[0]
@@ -41,43 +32,48 @@ def interfaceTest(case_list):
             method = case[3]
             url = case[2]
             param = case[4]
+            print(param)
             res_check = case[5]
         except Exception as e:
-            return '测试用例格式不正确%s'%e
+            return '测试用例格式不正确！ %s'%e
         if param== '':
             new_url = 'http://'+'api.test.com.cn'+url
         elif param== 'null':
-            new_url = 'http://'+url
+            url = strinfo.sub(str(seturl('seturl')),url)
+            new_url = 'http://'+ url
         else:
-            url = strinfo.sub(TaskId,url)
-            param = strinfo.sub(TaskId,param)
-            param = tasknoinfo.sub(taskno,param)
-            new_url = 'http://10.30.50.167:3030'+url
+            #拼接请求地址
+            url = str(seturl('seturl'))+str(url)
+            new_url = url
             request_urls.append(new_url)
         if method.upper() == 'GET':
-            headers = {'Authorization':'', 'Content-Type': 'application/json'}
+            headers = {'Authorization':'', 'Content-Type': 'application/json' }
             if "=" in urlParam(param):
                 data = None
                 print (str(case_id)+' request is get' +new_url.encode('utf-8')+'?'+urlParam(param).encode('utf-8'))
                 results = requests.get(new_url+'?'+urlParam(param),data,headers=headers).text
-                print (' response is get'+results.encode('utf-8'))
+                print(' response is get'+results.encode('utf-8'))
                 responses.append(results)
                 res = readRes(results,'')
             else:
-                print (' request is get ' +new_url+' body is '+urlParam(param))
+                print('request is get ' +new_url+' body is '+urlParam(param))
                 data = None
                 req = urllib.request.Request(url=new_url,data=data,headers=headers,method="GET")
-                results = urllib.request.urlopen(req).read()
-                print (' response is get ')
-                print(results)
+                try:
+                    results = urllib.request.urlopen(req).read()
+                    print (' response is get ')
+                    print(results)
+                except Exception as e:
+                    return writeResult(case_id,'0')
                 res = readRes(results,res_check)
-            #print results
-            if 'pass' == res:
-                writeResult(case_id,'1')
-                res_flags.append('pass')
-            else:
-                res_flags.append('fail')
-                writeResult(case_id,'0')
+                if 'pass' == res:
+                    res_flags.append('pass')
+                    writeResult(case_id,'1')
+
+                else:
+                    res_flags.append('fail')
+                    writeResult(case_id,'0')
+
         if method.upper()=='PUT':
             headers = {'Host':HOSTNAME, 'Connection':'keep-alive', 'CredentialId':id, 'Content-Type':'application/json'}
             body_data=param
@@ -90,11 +86,6 @@ def interfaceTest(case_list):
             else:
                 res_flags.append('fail')
                 writeResult(case_id,'fail')
-               # writeBug(case_id,interface_name,new_url,results,res_check)
-            try:
-                preOrderSN(results)
-            except:
-                print ('ok')
         if method.upper()=="PATCH":
             headers = {'Authorization':'Credential '+id, 'Content-Type': 'application/json' }
             data = None
@@ -107,22 +98,17 @@ def interfaceTest(case_list):
             else:
                 res_flags.append('fail')
                 writeResult(case_id,'fail')
-               # writeBug(case_id,interface_name,new_url,results,res_check)
-            try:
-                preOrderSN(results)
-            except:
-                print ('ok')
-        if method.upper()=="POST":
-            headers = {'Authorization':'Credential ', 'Content-Type': 'application/json'}
+
+        if method.upper()=="1":
+            headers = {'Authorization':'Credential ', 'Content-Type': 'application/json' }
             if "=" in urlParam(param):
                 data = None
                 results = requests.patch(new_url+'?'+urlParam(param),data,headers=headers).text
-                print ('response is post'+results.encode('utf-8'))
+                print (' response is post'+results.encode('utf-8'))
                 responses.append(results)
                 res = readRes(results,'')
             else:
-                #print (new_url)
-                print(str(case_id)+' request is ' +str(new_url)+' body is'+str(urlParam(param).encode('utf-8')))
+                #print (str(case_id)+' request is ' +str(new_url)+' body is'+str(urlParam(param)).encode('utf-8'))
                 results = requests.post(new_url,data=urlParam(param).encode('utf-8'),headers=headers).text
                 print(results.encode('utf-8'))
                 responses.append(results)
@@ -133,14 +119,12 @@ def interfaceTest(case_list):
             else:
                 res_flags.append('fail')
                 writeResult(case_id,'0')
-                #writeBug(case_id,interface_name,new_url,results,res_check)
-            try:
-                TaskId(results)
-            except:
-                print ('ok1')
+
 def readRes(res,res_check):
     res = res.replace('":"',"=").replace('":',"=")
+    print(res)
     res_check = res_check.split(';')
+    print(res_check)
     for s in res_check:
         if s in res:
             pass
@@ -160,33 +144,39 @@ def CredentialId():
     regx = '.*"CredentialId":"(.*)","Scene"'
     pm = re.search(regx, data)
     id = pm.group(1)
-def preOrderSN(results):
-    global preOrderSN
-    regx = '.*"preOrderSN":"(.*)","toHome"'
-    pm = re.search(regx, results)
-    if pm:
-        preOrderSN = pm.group(1).encode('utf-8')
-        return preOrderSN
-    return False
-def TaskId(results):
-    global TaskId
-    regx = '.*"TaskId":(.*),"PlanId"'
-    pm = re.search(regx, results)
-    if pm:
-        TaskId = pm.group(1).encode('utf-8')
-        return TaskId
-    return False
-def taskno(param):
-    global taskno
-    a = int(time.time())
-    taskno='task_'+str(a)
-    return taskno
+def seturl(set):
+    global setvalue
+    sql = "SELECT `setname`,`setvalue` from set_set"
+    coon =pymysql.connect(user='zhdbuser',passwd='zhdbuser123',db='autotest',port=3306,host='10.30.50.167',charset='utf8')
+    cursor = coon.cursor()
+    aa=cursor.execute(sql)
+    info = cursor.fetchmany(aa)
+    #print (info)
+    coon.commit()
+    cursor.close()
+    coon.close()
+    if info[0][0] == set:
+        setvalue = info[0][1]
+        print (setvalue)
+    return setvalue
+# def writeResult(case_id,result):
+#     result = result.encode('utf-8')
+#     now = time.strftime("%Y-%m-%d %H:%M:%S")
+#     sql = "UPDATE apitest_apistep set apitest_apistep.apistatus=%s,apitest_apistep.create_time=%s where apitest_apistep.id=%s;"
+#     param = (result,now,case_id)
+#     print ('api autotest result is '+result.decode())
+#     coon =pymysql.connect(user='root',passwd='test123456',db='autotest',port=3306,host='10.30.50.167',charset='utf8')
+#     cursor = coon.cursor()
+#     cursor.execute(sql,param)
+#     coon.commit()
+#     cursor.close()
+#     coon.close()
 def writeResult(case_id,result):
     result = result.encode('utf-8')
     now = time.strftime("%Y-%m-%d %H:%M:%S")
-    sql = "UPDATE apitest_apistep set apitest_apistep.apistatus=%s,apitest_apistep.create_time=%s where apitest_apistep.id=%s;"
+    sql = "UPDATE apitest_apis set apitest_apis.apistatus=%s,apitest_apis.create_time=%s where apitest_apis.id=%s;"
     param = (result,now,case_id)
-    print ('api autotest result is '+result.decode('utf-8'))
+    print ('api autotest result is '+result.decode())
     coon =pymysql.connect(user='zhdbuser',passwd='zhdbuser123',db='autotest',port=3306,host='10.30.50.167',charset='utf8')
     cursor = coon.cursor()
     cursor.execute(sql,param)
@@ -199,16 +189,23 @@ def writeResult(case_id,result):
 #     request = request.encode('utf-8')
 #     now = time.strftime("%Y-%m-%d %H:%M:%S")
 #     bugname = str(bug_id)+ '_' + interface_name.decode() + '_出错了'
-#     bugdetail = '[请求数据]<br />'+request.decode()+'<br/>'+'[预期结果]<br/>'+res_check.decode()+'<br/>'+'<br/>'+'[响应数据]<br />'+'<br/>'+response.decode()
+#     bugdetail = '[请求数据]<br />'+request.decode()+'<br/>'+'[预期结
+#     果]<br/>'+res_check.decode()+'<br/>'+'<br/>'+'[响应数据]<br />'+'<br/>'+response.decode()
 #     print (bugdetail)
-#     sql = 'test'
-#     coon =pymysql.connect(user='root',passwd='test123456',db='autotest',port=3306,host='127.0.0.1',charset='utf8')
+#     sql = "INSERT INTO `bug_bug` ("\
+#     "`bugname`,`bugdetail`,`bugstatus`,`buglevel`, `bugcreater`,
+#     `bugassign`,`created_time`,`Product_id`) "\
+#     "VALUES ('%s','%s','1','1','邹辉', '邹辉', '%s',
+#     '2');"%(bugname,pymysql.escape_string(bugdetail),now)
+#     coon =
+#     pymysql.connect(user='root',passwd='test123456',db='autotest',port=3306,host='127.0.0.1',charset='utf8
+#     ')
 #     cursor = coon.cursor()
 #     cursor.execute(sql)
 #     coon.commit()
 #     cursor.close()
 #     coon.close()
 if __name__ == '__main__':
-    pytest.main(['-s', 'apiauto_testcase3.py'])
+    test_readSQLcase()
     print ('Done!')
     time.sleep(1)
